@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criptografia RSA em Tempo Real</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #fd04a2;
+        }
+        h1, h2 { 
+            color: #ffffff; 
+        }
+        textarea, pre {
+            width: 100%;
+            box-sizing: border-box; /* Garante que o padding não quebre o layout */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+        }
+        textarea {
+            height: 100px;
+        }
+        pre {
+            background-color: #eee;
+            white-space: pre-wrap; /* Faz o texto longo quebrar a linha */
+            word-wrap: break-word; /* Quebra palavras longas */
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🔒 Teste de Criptografia RSA (feito em JavaScript)</h1>
+    <p>Fiz para testar um pouco mais meus conhecimentos.</p>
+
+
+    <div style="display: none;">
+        <h2>Chaves Geradas (2048 bits)</h2>
+        <p><strong>Chave Pública (para Criptografar):</strong></p>
+        <pre id="chavePublica">Gerando...</pre>
+
+        <p><strong>Chave Privada (para Descriptografar):</strong></p>
+        <pre id="chavePrivada">Gerando...</pre>
+    </div>
+
+    <hr>
+    
+
+    <h2>Teste em Tempo Real</h2>
+    
+    <label for="mensagem"><strong>Digite sua mensagem aqui:</strong></label>
+    <textarea id="mensagem" placeholder="Digite algo para criptografar..."></textarea>
+
+    <p><strong>Aqui está sua mensagem criptografada :D):</strong></p>
+    <pre id="criptografado">...</pre>
+    
+    <p><strong>Mensagem Descriptografada (para verificação):</strong></p>
+    <pre id="descriptografado">...</pre>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
+
+    <script>
+        // Pega os elementos da página para podermos interagir com eles
+        const inputMensagem = document.getElementById('mensagem');
+        const outPublica = document.getElementById('chavePublica');
+        const outPrivada = document.getElementById('chavePrivada');
+        const outCripto = document.getElementById('criptografado');
+        const outDecripto = document.getElementById('descriptografado');
+
+        // --- 1. GERAÇÃO DE CHAVES ---
+        // Cria uma nova instância de criptografia com chaves de 2048 bits
+        const crypt = new JSEncrypt({ default_key_size: 2048 });
+
+        // Mostra as chaves na tela
+        outPublica.textContent = crypt.getPublicKey();
+        outPrivada.textContent = crypt.getPrivateKey();
+
+        // --- 2. OUVINTE DE EVENTO (A MÁGICA "NA HORA") ---
+        // Esta função roda *toda vez* que você digita uma letra
+        inputMensagem.addEventListener('input', function() {
+            const texto = this.value;
+
+            if (texto === "") {
+                // Limpa os campos se a mensagem estiver vazia
+                outCripto.textContent = "...";
+                outDecripto.textContent = "...";
+                return;
+            }
+
+            // --- 3. CRIPTOGRAFIA ---
+            // Criptografa o texto digitado com a Chave Pública
+            const criptografado = crypt.encrypt(texto);
+
+            if (criptografado) {
+                outCripto.textContent = criptografado;
+                
+                // --- 4. DESCRIPTOGRAFIA ---
+                // Descriptografa o texto com a Chave Privada (só para provar que funciona)
+                const descriptografado = crypt.decrypt(criptografado);
+                outDecripto.textContent = descriptografado;
+            } else {
+                // Isso pode acontecer se a mensagem for muito longa para o RSA
+                outCripto.textContent = "Erro: Mensagem muito longa para criptografar com RSA.";
+                outDecripto.textContent = "...";
+            }
+        });
+
+    </script>
+
+</body>
+</html>
